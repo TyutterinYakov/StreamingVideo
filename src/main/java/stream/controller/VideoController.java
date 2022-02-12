@@ -1,6 +1,7 @@
 package stream.controller;
 
 import java.io.InputStream;
+import java.security.Principal;
 import java.text.DecimalFormat;
 import java.util.List;
 
@@ -11,6 +12,7 @@ import org.springframework.http.HttpRange;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -28,7 +30,7 @@ import stream.model.VideoMetadataResponse;
 import stream.service.VideoService;
 
 @RestController
-@RequestMapping("/api/v1/video")
+@RequestMapping("/api/video")
 @CrossOrigin("*")
 public class VideoController {
 
@@ -46,7 +48,7 @@ public class VideoController {
 	@GetMapping("/all")
 	public List<VideoMetadataResponse> getAllVideo(){
 		
-		return videoService.getAllVideo();
+		return videoService.getAllAccessVideo();
 	}
 	
 	@GetMapping("/{videoId}")
@@ -91,9 +93,10 @@ public class VideoController {
 	}
 	
 	@PostMapping(path="/upload", consumes=MediaType.MULTIPART_FORM_DATA_VALUE)
-	public ResponseEntity<?> uploadVideo(VideoMetadataRequest request){
+	@PreAuthorize("hasAuthority('user:read')")
+	public ResponseEntity<?> uploadVideo(VideoMetadataRequest request, Principal principal){
 		try {
-			videoService.saveNewVideo(request);
+			videoService.saveNewVideo(request, principal.getName());
 		} catch(Exception ex) {
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
 		}

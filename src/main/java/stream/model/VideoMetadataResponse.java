@@ -3,10 +3,17 @@ package stream.model;
 public class VideoMetadataResponse {
 
 	private Long videoId;
+	private String title;
+	private String userName;
+	private Long userId;
 	private String description;
 	private String contentType;
 	private String previewUrl;
 	private String streamUrl;
+	private Long likes;
+	private Long dislike;
+	private Long views;
+	private String status;
 	public Long getVideoId() {
 		return videoId;
 	}
@@ -37,6 +44,52 @@ public class VideoMetadataResponse {
 	public void setContentType(String contentType) {
 		this.contentType = contentType;
 	}
+	public String getTitle() {
+		return title;
+	}
+	public void setTitle(String title) {
+		this.title = title;
+	}
+	public String getUserName() {
+		return userName;
+	}
+	public void setUserName(String userName) {
+		this.userName = userName;
+	}
+	public Long getUserId() {
+		return userId;
+	}
+	public void setUserId(Long userId) {
+		this.userId = userId;
+	}
+	public Long getLikes() {
+		return likes;
+	}
+	public void setLikes(Long likes) {
+		this.likes = likes;
+	}
+	public Long getDislike() {
+		return dislike;
+	}
+	public void setDislike(Long dislike) {
+		this.dislike = dislike;
+	}
+	public Long getViews() {
+		return views;
+	}
+	public void setViews(Long views) {
+		this.views = views;
+	}
+	public String getStatus() {
+		return status;
+	}
+	public void setStatus(String status) {
+		this.status = status;
+	}
+	
+	
+	
+	
 	
 	
 }

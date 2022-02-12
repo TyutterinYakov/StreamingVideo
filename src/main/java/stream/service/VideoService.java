@@ -16,12 +16,16 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpRange;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import stream.Utils.Utils;
+import stream.dao.UserRepository;
 import stream.dao.VideoMetadataRepository;
 import stream.exception.NotFoundException;
+import stream.model.StatusVideo;
 import stream.model.StreamBytesInfo;
+import stream.model.User;
 import stream.model.VideoMetadata;
 import stream.model.VideoMetadataRequest;
 import stream.model.VideoMetadataResponse;
@@ -39,54 +43,50 @@ public class VideoService {
 	
 	private final VideoMetadataRepository videoDao;
 	private final FrameGrabberService frameService;
+	private final UserRepository userDao;
 	
 	@Autowired
-	public VideoService(VideoMetadataRepository videoDao, FrameGrabberService frameService) {
+	public VideoService(VideoMetadataRepository videoDao, FrameGrabberService frameService, UserRepository userDao) {
 		super();
 		this.videoDao = videoDao;
 		this.frameService = frameService;
+		this.userDao = userDao;
 	}
 	
-	public List<VideoMetadataResponse> getAllVideo(){
-		return videoDao.findAll()
+	public List<VideoMetadataResponse> getAllAccessVideo(){
+		return videoDao.findAllByStatus(StatusVideo.PUBLIC)
 				.stream().map(
 						vmd->{
 							return vmd.convertToVideoMetadataResponse();
 						}).collect(Collectors.toList());
 	}
 	
+
 	public VideoMetadataResponse getVideoById(Long id) throws NotFoundException {
-		VideoMetadata video = videoDao.findById(id).orElseThrow(NotFoundException::new);
+		VideoMetadata video = videoDao.findByIdAndStatus(id, StatusVideo.PUBLIC.name(), StatusVideo.LINK.name()).orElseThrow(NotFoundException::new);
 		return video.convertToVideoMetadataResponse();
 	}
 	
 	@Transactional
-	public void saveNewVideo(VideoMetadataRequest request) throws NotFoundException {
+	public void saveNewVideo(VideoMetadataRequest request, String userName) throws NotFoundException {
 		if(request.getFile()==null) {
 			throw new NotFoundException();
 		}
+		User user = userDao.findByEmail(userName).orElseThrow(()->
+				new UsernameNotFoundException(userName));
+		
+		
 		VideoMetadata video = new VideoMetadata();
 		video.setFileName(request.getFile().getOriginalFilename());
 		video.setContentType(request.getFile().getContentType());
 		video.setDescription(request.getDescription());
 		video.setFileSize(request.getFile().getSize());
+		video.setUser(user);
 		video = videoDao.save(video);
 		
-		Path directory = Path.of(dataFolder, video.getVideoId().toString());
-		try {
-			Files.createDirectories(directory);
-			Path file = Path.of(directory.toString(), request.getFile().getOriginalFilename());
-			try(OutputStream os = Files.newOutputStream(file, CREATE, WRITE)){
-				request.getFile().getInputStream().transferTo(os);
-			}
-			Long lengthVideo = frameService.generatePreviewPictures(file);
-			video.setVideoLength(lengthVideo);
-			videoDao.save(video);
-		} catch(IOException ex) {
-			logger.error("", ex);
-			throw new IllegalStateException();
-		}
+		generatePreviewImage(request, video);
 	}
+
 	
 	public Optional<InputStream> getPreviewInputStream(Long id){
 		return videoDao.findById(id)
@@ -141,6 +141,24 @@ public class VideoService {
 			logger.error("",ex);
 			throw new NotFoundException();
 			
+		}
+	}
+	
+	
+	private VideoMetadata generatePreviewImage(VideoMetadataRequest request, VideoMetadata video) {
+		Path directory = Path.of(dataFolder, video.getVideoId().toString());
+		try {
+			Files.createDirectories(directory);
+			Path file = Path.of(directory.toString(), request.getFile().getOriginalFilename());
+			try(OutputStream os = Files.newOutputStream(file, CREATE, WRITE)){
+				request.getFile().getInputStream().transferTo(os);
+			}
+			Long lengthVideo = frameService.generatePreviewPictures(file);
+			video.setVideoLength(lengthVideo);
+			return videoDao.save(video);
+		} catch(IOException ex) {
+			logger.error("", ex);
+			throw new IllegalStateException();
 		}
 	}
 	
