@@ -62,6 +62,16 @@ public class VideoMetadata {
 		this.videoLength = videoLength;
 	}
 	
+	public VideoMetadataResponse convertToVideoMetadataResponse() {
+		VideoMetadataResponse response = new VideoMetadataResponse();
+		response.setContentType(this.contentType);
+		response.setDescription(this.description);
+		response.setPreviewUrl("/api/v1/video/preview/"+this.videoId);
+		response.setStreamUrl("/api/v1/video/stream/"+this.videoId);
+		response.setVideoId(this.videoId);
+		return response;
+	}
+	
 	
 	
 }

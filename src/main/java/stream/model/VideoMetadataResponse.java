@@ -38,4 +38,5 @@ public class VideoMetadataResponse {
 		this.contentType = contentType;
 	}
 	
+	
 }
