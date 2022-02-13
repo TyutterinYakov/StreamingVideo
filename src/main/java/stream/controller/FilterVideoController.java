@@ -39,8 +39,8 @@ public class FilterVideoController {
 	
 	//Получение видео на канале
 	@GetMapping("/user/{userId}")
-	public ResponseEntity<?> getAccessVideoChannelUser(@PathVariable("userId") Long id) throws UserNotFoundException, BadRequestException{
-		
+	public ResponseEntity<?> getAccessVideoChannelUser(@PathVariable("userId") Long id) 
+			throws UserNotFoundException, BadRequestException{
 		if(id==null||id==0) {
 			throw new BadRequestException();
 		}
@@ -56,13 +56,15 @@ public class FilterVideoController {
 	
 	@DeleteMapping("/user/{id}")
 	@PreAuthorize("hasAuthority('user:read')")
-	public ResponseEntity<?> deleteVideoUser(Principal principal, @PathVariable("id") Long id) throws NotFoundException, UserNotFoundException{
+	public ResponseEntity<?> deleteVideoUser(Principal principal, @PathVariable("id") Long id) 
+			throws NotFoundException, UserNotFoundException{
 		filterService.deleteVideoUser(id, principal.getName());
 		return new ResponseEntity<>(HttpStatus.ACCEPTED);
 	}
 	
 	@PostMapping("/user/grade")
-	public ResponseEntity<?> gradeVideoUser(GradeVideoRequest request, Principal principal) throws UserNotFoundException, NotFoundException{
+	public ResponseEntity<?> gradeVideoUser(GradeVideoRequest request, Principal principal) 
+			throws UserNotFoundException, NotFoundException{
 		filterService.gradeVideoAdd(principal.getName(), request);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}

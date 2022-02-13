@@ -58,14 +58,14 @@ public class FilterVideoService {
 	
 	public void deleteVideoUser(Long id, String userName) throws NotFoundException, UserNotFoundException {
 		User user = userDao.findByEmail(userName).orElseThrow(UserNotFoundException::new);		
-		VideoMetadata video = videoDao.findByIdAndUser(id, user).orElseThrow(NotFoundException::new);
+		VideoMetadata video = videoDao.findByVideoIdAndUser(id, user).orElseThrow(NotFoundException::new);
 		video.setStatus(StatusVideo.DELETE);
 		videoDao.save(video);
 	}
 
 	public void gradeVideoAdd(String userName, GradeVideoRequest request) throws UserNotFoundException, NotFoundException {
 		User user = userDao.findByEmail(userName).orElseThrow(UserNotFoundException::new);
-		VideoMetadata video = videoDao.findByIdAndStatus(request.getVideoId(), 
+		VideoMetadata video = videoDao.findByVideoIdAndStatus(request.getVideoId(), 
 				StatusVideo.LINK.name(), StatusVideo.PUBLIC.name()).orElseThrow(NotFoundException::new);
 		Optional<GradeUserVideo> grade =  gradeDao.findByUserAndVideo(user, video);
 		if(request.getGrade().equals(StatusGrade.LIKE.name())) {

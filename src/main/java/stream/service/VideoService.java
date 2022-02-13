@@ -63,7 +63,8 @@ public class VideoService {
 	
 
 	public VideoMetadataResponse getVideoById(Long id) throws NotFoundException {
-		VideoMetadata video = videoDao.findByIdAndStatus(id, StatusVideo.PUBLIC.name(), StatusVideo.LINK.name()).orElseThrow(NotFoundException::new);
+		VideoMetadata video = videoDao.findByVideoIdAndStatus(id, StatusVideo.PUBLIC.name(), 
+				StatusVideo.LINK.name()).orElseThrow(NotFoundException::new);
 		video.setViews(video.getViews()+1L);
 		videoDao.save(video);
 		return video.convertToVideoMetadataResponse();
