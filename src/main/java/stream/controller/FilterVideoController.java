@@ -9,14 +9,18 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import stream.exception.BadRequestException;
+import stream.exception.NotFoundException;
 import stream.exception.UserNotFoundException;
+import stream.model.GradeVideoRequest;
 import stream.service.FilterVideoService;
 
 @RestController
@@ -50,6 +54,19 @@ public class FilterVideoController {
 		return ResponseEntity.ok(filterService.getAllVideoUser(principal.getName()));
 	}
 	
+	@DeleteMapping("/user/{id}")
+	@PreAuthorize("hasAuthority('user:read')")
+	public ResponseEntity<?> deleteVideoUser(Principal principal, @PathVariable("id") Long id) throws NotFoundException, UserNotFoundException{
+		filterService.deleteVideoUser(id, principal.getName());
+		return new ResponseEntity<>(HttpStatus.ACCEPTED);
+	}
+	
+	@PostMapping("/user/grade")
+	public ResponseEntity<?> gradeVideoUser(GradeVideoRequest request, Principal principal) throws UserNotFoundException, NotFoundException{
+		filterService.gradeVideoAdd(principal.getName(), request);
+		return new ResponseEntity<>(HttpStatus.OK);
+	}
+	
 	
 	
 	
@@ -65,6 +82,11 @@ public class FilterVideoController {
 	public ResponseEntity<Void> badRequestException(BadRequestException ex){
 		logger.error("",ex);
 		return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+	}
+	@ExceptionHandler
+	public ResponseEntity<Void> notFoundException(NotFoundException ex){
+		logger.error("",ex);
+		return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
 	}
 	
 }

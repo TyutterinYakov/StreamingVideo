@@ -28,4 +28,6 @@ public interface VideoMetadataRepository extends JpaRepository<VideoMetadata, Lo
 	@Query(nativeQuery=true, value="SELECT * FROM video_metadata WHERE video_id=?1 AND (status=?2 OR status=?3)")
 	Optional<VideoMetadata> findByIdAndStatus(Long id, String public1, String link);
 
+	Optional<VideoMetadata> findByIdAndUser(Long id, User user);
+
 }

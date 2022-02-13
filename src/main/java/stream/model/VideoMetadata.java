@@ -1,5 +1,8 @@
 package stream.model;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -10,6 +13,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 @Entity
@@ -31,12 +35,12 @@ public class VideoMetadata {
 	@Column(name="video_length")
 	private Long videoLength;
 	private Long views=0L;
-	private Long likes=0L;
-	private Long dislike=0L;
 	@Enumerated(value = EnumType.STRING)
 	private StatusVideo status;
 	@ManyToOne(cascade=CascadeType.REFRESH, fetch=FetchType.EAGER)
 	private User user;
+	@OneToMany(cascade=CascadeType.REMOVE, fetch=FetchType.LAZY)
+	private Set<GradeUserVideo> grades = new HashSet<>();
 	
 	public Long getVideoId() {
 		return videoId;
@@ -93,25 +97,18 @@ public class VideoMetadata {
 	}
 	public void setViews(Long views) {
 		this.views = views;
-	}
-	public Long getLikes() {
-		return likes;
-	}
-	public void setLikes(Long likes) {
-		this.likes = likes;
-	}
-	public Long getDislike() {
-		return dislike;
-	}
-	public void setDislike(Long dislike) {
-		this.dislike = dislike;
-	}
-	
+	}	
 	public StatusVideo getStatus() {
 		return status;
 	}
 	public void setStatus(StatusVideo status) {
 		this.status = status;
+	}
+	public Set<GradeUserVideo> getGrades() {
+		return grades;
+	}
+	public void setGrades(Set<GradeUserVideo> grades) {
+		this.grades = grades;
 	}
 	public VideoMetadataResponse convertToVideoMetadataResponse() {
 		VideoMetadataResponse response = new VideoMetadataResponse();
@@ -124,8 +121,6 @@ public class VideoMetadata {
 		response.setUserId(user.getUserId());
 		response.setTitle(this.title);
 		response.setViews(this.views);
-		response.setLikes(this.likes);
-		response.setDislike(this.dislike);
 		response.setStatus(this.status.name());
 		return response;
 	}

@@ -10,10 +10,9 @@ public class VideoMetadataResponse {
 	private String contentType;
 	private String previewUrl;
 	private String streamUrl;
-	private Long likes;
-	private Long dislike;
 	private Long views;
 	private String status;
+	
 	public Long getVideoId() {
 		return videoId;
 	}
@@ -61,18 +60,6 @@ public class VideoMetadataResponse {
 	}
 	public void setUserId(Long userId) {
 		this.userId = userId;
-	}
-	public Long getLikes() {
-		return likes;
-	}
-	public void setLikes(Long likes) {
-		this.likes = likes;
-	}
-	public Long getDislike() {
-		return dislike;
-	}
-	public void setDislike(Long dislike) {
-		this.dislike = dislike;
 	}
 	public Long getViews() {
 		return views;

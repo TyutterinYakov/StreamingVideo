@@ -1,5 +1,6 @@
 package stream.model;
 
+import java.util.HashSet;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
@@ -32,6 +33,8 @@ public class User {
 	private Set<VideoMetadata> videos;
 	@Enumerated(value = EnumType.STRING)
 	private Role role;
+	@OneToMany(cascade=CascadeType.REMOVE, fetch=FetchType.LAZY)
+	private Set<GradeUserVideo> grades=new HashSet<>();
 	
 	
 	public Long getUserId() {
@@ -88,6 +91,13 @@ public class User {
 	public void setActive(boolean active) {
 		this.active = active;
 	}
+	public Set<GradeUserVideo> getGrades() {
+		return grades;
+	}
+	public void setGrades(Set<GradeUserVideo> grades) {
+		this.grades = grades;
+	}
+	
 	
 	
 	
