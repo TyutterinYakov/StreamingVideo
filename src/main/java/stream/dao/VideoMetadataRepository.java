@@ -30,5 +30,7 @@ public interface VideoMetadataRepository extends JpaRepository<VideoMetadata, Lo
 
 	Optional<VideoMetadata> findByVideoIdAndUser(Long id, User user);
 
+	Optional<VideoMetadata> findByUserAndVideoIdAndStatusIsNot(User user, Long videoId, StatusVideo delete);
+
 
 }

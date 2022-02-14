@@ -1,5 +1,8 @@
 package stream.model;
 
+import java.util.HashSet;
+import java.util.Set;
+
 public class VideoMetadataResponse {
 
 	private Long videoId;
@@ -73,6 +76,7 @@ public class VideoMetadataResponse {
 	public void setStatus(String status) {
 		this.status = status;
 	}
+	
 	
 	
 	

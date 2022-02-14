@@ -80,6 +80,7 @@ public class VideoService {
 		
 		
 		VideoMetadata video = new VideoMetadata();
+		video.setStatus(StatusVideo.PUBLIC);
 		video.setFileName(request.getFile().getOriginalFilename());
 		video.setContentType(request.getFile().getContentType());
 		video.setDescription(request.getDescription());

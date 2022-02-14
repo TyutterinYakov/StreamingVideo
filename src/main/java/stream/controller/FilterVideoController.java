@@ -63,11 +63,21 @@ public class FilterVideoController {
 	}
 	
 	@PostMapping("/user/grade")
+	@PreAuthorize("hasAuthority('user:read')")
 	public ResponseEntity<?> gradeVideoUser(GradeVideoRequest request, Principal principal) 
 			throws UserNotFoundException, NotFoundException{
 		filterService.gradeVideoAdd(principal.getName(), request);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
+	
+	@PostMapping("/user/access")
+	@PreAuthorize("hasAuthority('user:read')")
+	public ResponseEntity<?> changeVideoAccess(Long videoId, String status, Principal principal) 
+			throws UserNotFoundException, NotFoundException{
+		filterService.changeAccessVideoUser(videoId, principal.getName(), status);
+		return ResponseEntity.status(HttpStatus.OK).build();
+	}
+	
 	
 	
 	
@@ -89,6 +99,11 @@ public class FilterVideoController {
 	public ResponseEntity<Void> notFoundException(NotFoundException ex){
 		logger.error("",ex);
 		return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+	}
+	@ExceptionHandler
+	public ResponseEntity<Void> nullPointerException(NullPointerException ex){
+		logger.error("",ex);
+		return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
 	}
 	
 }

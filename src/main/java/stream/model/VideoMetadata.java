@@ -41,6 +41,9 @@ public class VideoMetadata {
 	private User user;
 	@OneToMany(cascade=CascadeType.REMOVE, fetch=FetchType.LAZY)
 	private Set<GradeUserVideo> grades = new HashSet<>();
+	@OneToMany(cascade=CascadeType.REMOVE, fetch=FetchType.LAZY)
+	private Set<Comment> comments = new HashSet<>();
+	
 	
 	public Long getVideoId() {
 		return videoId;
@@ -110,6 +113,14 @@ public class VideoMetadata {
 	public void setGrades(Set<GradeUserVideo> grades) {
 		this.grades = grades;
 	}
+	public Set<Comment> getComments() {
+		return comments;
+	}
+	public void setComments(Set<Comment> comments) {
+		this.comments = comments;
+	}
+	
+	
 	public VideoMetadataResponse convertToVideoMetadataResponse() {
 		VideoMetadataResponse response = new VideoMetadataResponse();
 		response.setContentType(this.contentType);

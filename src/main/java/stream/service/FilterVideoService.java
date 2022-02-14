@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import javax.transaction.Transactional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -38,7 +40,7 @@ public class FilterVideoService {
 	
 
 
-
+	@Transactional
 	public List<VideoMetadataResponse> getAccessVideoUser(Long id) throws UserNotFoundException {
 		User user = userDao.findById(id).orElseThrow(UserNotFoundException::new);
 		return videoDao.findAllByUserAndStatus(user, StatusVideo.PUBLIC).stream().map(
@@ -47,7 +49,7 @@ public class FilterVideoService {
 				}).collect(Collectors.toList());
 	}
 	
-
+	@Transactional
 	public List<VideoMetadataResponse> getAllVideoUser(String userName) throws UserNotFoundException{
 		User user = userDao.findByEmail(userName).orElseThrow(UserNotFoundException::new);
 		return videoDao.findByUserAndStatusIsNot(user, StatusVideo.DELETE).stream().map(
@@ -56,6 +58,7 @@ public class FilterVideoService {
 				}).collect(Collectors.toList());
 	}
 	
+	@Transactional
 	public void deleteVideoUser(Long id, String userName) throws NotFoundException, UserNotFoundException {
 		User user = userDao.findByEmail(userName).orElseThrow(UserNotFoundException::new);		
 		VideoMetadata video = videoDao.findByVideoIdAndUser(id, user).orElseThrow(NotFoundException::new);
@@ -63,6 +66,7 @@ public class FilterVideoService {
 		videoDao.save(video);
 	}
 
+	@Transactional
 	public void gradeVideoAdd(String userName, GradeVideoRequest request) throws UserNotFoundException, NotFoundException {
 		User user = userDao.findByEmail(userName).orElseThrow(UserNotFoundException::new);
 		VideoMetadata video = videoDao.findByVideoIdAndStatus(request.getVideoId(), 
@@ -77,10 +81,21 @@ public class FilterVideoService {
 				gradeDao.delete(grade.get());
 			}
 		}
+	}
+	@Transactional
+	public void changeAccessVideoUser(Long videoId, String userName, String status) throws UserNotFoundException, NotFoundException {
+		User user = userDao.findByEmail(userName).orElseThrow(UserNotFoundException::new);
+		VideoMetadata video = videoDao.findByUserAndVideoIdAndStatusIsNot(user, videoId, StatusVideo.DELETE).orElseThrow(NotFoundException::new);
+		for(StatusVideo s : StatusVideo.values()) {
+			if(s.name().equals(status)) {
+				video.setStatus(s);
+				videoDao.save(video);
+				break;
+			}
+		}
 		
 	}
-	
-	
+	@Transactional
 	private GradeUserVideo setStatusGrade(Optional<GradeUserVideo> opt, StatusGrade status, User user, VideoMetadata video) {
 		GradeUserVideo grade = new GradeUserVideo();
 		if(opt.isPresent()) {
@@ -93,6 +108,7 @@ public class FilterVideoService {
 		}
 		return grade;		
 	}
+
 
 
 
